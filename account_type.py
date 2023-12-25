@@ -52,6 +52,10 @@ class Customer(Person):
     def get_bookings(self):
         return self.__db.get(ManagerType.BOOKING)
 
+    def save_customer(self):
+        self.__db.insert_all(ManagerType.CUSTOMER, self.__person)
+        return True
+
 
 class Admin(Person):
     def __init__(self,name,address,email,phone,account, data_base: FakeNoSQLDB):

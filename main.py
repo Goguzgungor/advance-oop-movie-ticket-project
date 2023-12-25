@@ -73,32 +73,60 @@ mail = input("Email: ")
 name = input("Password: ")
 
 account = Account(mail, name);
-person = Person("name", "address", mail, "55555555", account)
-customer:Customer = Customer(db, person)
+person = Person(mail, "address", mail, "55555555", account)
+customer: Customer = Customer(db, person)
 print("Kayıt başarılı. Lütfen giriş yapınız.")
 print("Giriş başarılı. Lütfen bilet sayısını giriniz.")
 ticketCount = input("Bilet sayısı: ")
 print("Ödeme tipini seçiniz.")
 print("1- Kredi Kartı")
 print("2- Nakit")
-paymentType_str= input("Ödeme tipi: ")
+paymentType_str = input("Ödeme tipi: ")
 paymentType = None
 try:
     paymentType = PaymentType[paymentType_str.upper()]  # Assuming input is in uppercase
 except KeyError:
     print("Geçersiz ödeme tipi.")
 if paymentType != None:
-    bookTicket:Booking = Booking(1, ticketCount, BookingStatus.REQUESTED, newMovie, 2, paymentType)
+    bookTicket: Booking = Booking(4, ticketCount, BookingStatus.REQUESTED, newMovie, 2, paymentType)
+    customer.make_booking(bookTicket)
     bookTicket.make_payment(customer)
     print("Ödeme başarılı.")
     print("Biletiniz hazırlanıyor.")
     print("Biletiniz hazır.")
 notification_type = input("Biletinizin size ulaşması için lütfen iletişim bilgilerinizi giriniz. (MAIL/SMS)")
 if notification_type == "MAIL":
-    notificationService = EmailNotification(1, "Mail gönderildi.",customer.get_email())
+    notificationService = EmailNotification(1, "Mail gönderildi.", customer.get_email())
     notificationService.send_notification()
 elif notification_type == "SMS":
-    notificationService = SMSNotification(1, "Sms gönderildi.",customer.get_phone())
+    notificationService = SMSNotification(1, "Sms gönderildi.", customer.get_phone())
     notificationService.send_notification()
 print("İyi seyirler.")
+
+mail = input("Email: ")
+booking_number = input("Booking Number: ")
+booking: list[Booking] = db.get(ManagerType.BOOKING)
+
+for element in booking:
+    if element.get_booking_number() == int(booking_number):
+        print("Biletiniz bulundu.")
+        print("İptal etmek istiyor musunuz?")
+        isCancel = input("E/H")
+        if isCancel == "E":
+            element.cancel()
+            print("İptal edildi.")
+            # iptal edilmiş hali sisteme yüklenir. STATUS = CANCELLED
+            db.insert_all(ManagerType.BOOKING, booking)
+            element.get_show().set_seats(element.get_show().get_seats() + element.get_number_of_seats())
+            db.insert_all(ManagerType.SHOW, element.get_show())
+        else:
+            print("İptal edilmedi.")
+
+notification_type = input("İptal faturanızı nasıl almak istersiniz? (MAIL/SMS)")
+if notification_type == "MAIL":
+    notificationService = EmailNotification(1, "Mail gönderildi.", customer.get_email())
+    notificationService.send_notification()
+elif notification_type == "SMS":
+    notificationService = SMSNotification(1, "Sms gönderildi.", customer.get_phone())
+    notificationService.send_notification()
 

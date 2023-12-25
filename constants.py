@@ -18,7 +18,7 @@ class PaymentStatus(Enum):
 
 
 class ManagerType(Enum):
-    MOVIE,SHOW,BOOKING,CINEMA = "movie","show","booking","cinema"
+    MOVIE,SHOW,BOOKING,CINEMA,CUSTOMER = "movie","show","booking","cinema","customer"
 
 class Address:
     def __init__(self, street, city, state, zip_code, country):

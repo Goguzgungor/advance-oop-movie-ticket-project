@@ -62,6 +62,31 @@ class Booking:
         self.__seats = show_seats
         self.__payment_type = payment_tpye
 
+    def get_booking_number(self):
+        return self.__booking_number
+
+    def get_number_of_seats(self):
+        return self.__number_of_seats
+
+    def get_created_on(self):
+        return self.__created_on
+
+    def get_status(self):
+        return self.__status
+
+    def get_show(self):
+        return self.__show
+
+    def get_seats(self):
+        return self.__seats
+
+    def get_payment_type(self):
+        return self.__payment_type
+
+    def set_status(self, status:BookingStatus):
+        self.__status = status
+        return True
+
     def make_payment(self,user):
         if(self.__payment_type == PaymentType.CASH):
             self.__payment = CashTransaction(self.__show.get_price(), "123", PaymentStatus.PENDING, 100)
