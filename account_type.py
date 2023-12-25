@@ -1,5 +1,11 @@
 from abc import ABC
-from .constants import AccountStatus
+from xmlrpc.client import Boolean
+
+from booking import Booking
+from dao.db import FakeNoSQLDB
+from main import db
+from show import Movie, Show
+from .constants import AccountStatus, ManagerType
 
 
 # For simplicity, we are not defining getter and setter functions. The reader can
@@ -13,8 +19,9 @@ class Account:
         self.__password = password
         self.__status = status
 
-    def reset_password(self):
-        None
+    def reset_password(self, password):
+        self.__password = password;
+        return True
 
 
 # from abc import ABC, abstractmethod
@@ -26,31 +33,47 @@ class Person(ABC):
         self.__phone = phone
         self.__account = account
 
-
+    def get_name(self):
+        return self.__name
+    def get_address(self):
+        return self.__address
+    def get_email(self):
+        return self.__email
+    def get_phone(self):
+        return self.__phone
 class Customer(Person):
+    def __init__(self, db:FakeNoSQLDB,person:Person):
+        self.__db = db
+        self.__person = person
     def make_booking(self, booking):
-        None
+        self.__db.insertAll(ManagerType.BOOKING, booking)
+        return True
 
     def get_bookings(self):
-        None
+        return self.__db.get(ManagerType.BOOKING)
 
 
 class Admin(Person):
-    def add_movie(self, movie):
-        None
+    def __init__(self,name,address,email,phone,account, data_base: FakeNoSQLDB):
+        super().__init__(name, address, email, phone, account)
+        self.data_base = data_base
 
-    def add_show(self, show):
-        None
-
-    def block_user(self, customer):
-        None
+    def add_movie(self, movie: Movie) -> Boolean:
+        self.data_base.insertAll(ManagerType.MOVIE, movie)
+        return True
+    def add_show(self, show: Show):
+        self.data_base.insertAll(ManagerType.SHOW, show)
+        return True
+    def block_user(self, customer: Customer)->Boolean:
+        self.data_base.insertAll("blok", customer)
+        return True
 
 
 class FrontDeskOfficer(Person):
-    def create_booking(self, booking):
+    def create_booking(self, booking:Booking):
         None
 
 
 class Guest:
-    def register_account(self):
-        None
+    def register_account(self,id,password) -> Account:
+        return Account(password, id, AccountStatus.Active);
